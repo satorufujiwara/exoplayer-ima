@@ -28,6 +28,7 @@ import jp.satorufujiwara.player.assets.AssetsVideoSource;
 public class AdPlayerController {
 
     private boolean isAdDisplayed = false;
+    private boolean isAdPlaying = false;
     private final VideoAdPlayer videoAdPlayer;
     private final ContentProgressProvider contentProgressProvider;
     private final ViewGroup adUiContainer;
@@ -210,10 +211,10 @@ public class AdPlayerController {
                                 requestResumeContent();
                                 break;
                             case PAUSED:
-
+                                isAdPlaying = false;
                                 break;
                             case RESUMED:
-
+                                isAdPlaying = true;
                                 break;
                             case ALL_ADS_COMPLETED:
                                 if (adsManager != null) {
@@ -259,6 +260,10 @@ public class AdPlayerController {
         request.setContentProgressProvider(contentProgressProvider);
 
         adsLoader.requestAds(request);
+    }
+
+    public boolean isAdPlaying() {
+        return isAdPlaying;
     }
 
     public void pause() {
@@ -308,12 +313,14 @@ public class AdPlayerController {
 
     private void requestResumeContent() {
         isAdDisplayed = false;
+        isAdPlaying = false;
         if (resumeContentListener != null) {
             resumeContentListener.onResumeContentRequested();
         }
     }
 
     private void requestPauseContent() {
+        isAdPlaying = true;
         if (pauseContentListener != null) {
             pauseContentListener.onPauseContentRequested();
         }
