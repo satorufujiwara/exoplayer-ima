@@ -1,4 +1,4 @@
-exoplayer-textureview
+exoplayer-ima
 ===
 
 [![License](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
@@ -7,6 +7,7 @@ exoplayer-textureview
 *This library is experimental. API and all codes will be changed without notice*
 
 [Google Interactive Media Ads (IMA) SDK](https://developers.google.com/interactive-media-ads/docs/sdks/android/)'s wrapper for using with [ExoPlayer](https://github.com/google/ExoPlayer) and TextureView.
+
 This library depends on [exoplayer-textureview](https://github.com/satorufujiwara/exoplayer-textureview)
 
 # Features
@@ -22,6 +23,7 @@ dependencies {
     compile 'jp.satorufujiwara:exoplayer-ima:0.0.1'
     compile 'jp.satorufujiwara:exoplayer-textureview:0.6.8'
     compile 'com.google.android.exoplayer:exoplayer:r1.5.9'
+    compile 'com.google.ads.interactivemedia.v3:interactivemedia:3.2.1'
 }
 ```
 
