@@ -23,6 +23,7 @@ dependencies {
     compile 'jp.satorufujiwara:exoplayer-ima:0.0.1'
     compile 'jp.satorufujiwara:exoplayer-textureview:0.6.8'
     compile 'com.google.android.exoplayer:exoplayer:r1.5.9'
+    compile 'com.google.ads.interactivemedia.v3:interactivemedia:3.2.1'
 }
 ```
 
