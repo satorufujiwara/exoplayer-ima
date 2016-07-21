@@ -18,6 +18,9 @@ import android.net.Uri;
 import android.text.TextUtils;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jp.satorufujiwara.player.VideoSource;
 import jp.satorufujiwara.player.VideoTexturePresenter;
 import jp.satorufujiwara.player.assets.AssetsVideoSource;
@@ -30,6 +33,7 @@ public class AdPlayerController {
     private final ViewGroup adUiContainer;
     private final ImaSdkFactory sdkFactory;
     private final AdsLoader adsLoader;
+    private final List<VideoAdPlayer.VideoAdPlayerCallback> adCallbacks = new ArrayList<>(1);
     private AdsManager adsManager;
     private OnResumeContentListener resumeContentListener;
     private OnPauseContentListener pauseContentListener;
@@ -74,12 +78,12 @@ public class AdPlayerController {
 
             @Override
             public void addCallback(VideoAdPlayerCallback videoAdPlayerCallback) {
-
+                adCallbacks.add(videoAdPlayerCallback);
             }
 
             @Override
             public void removeCallback(VideoAdPlayerCallback videoAdPlayerCallback) {
-
+                adCallbacks.remove(videoAdPlayerCallback);
             }
 
             @Override
@@ -91,6 +95,67 @@ public class AdPlayerController {
                         videoTexturePresenter.getDuration());
             }
         };
+        videoAdPlayer.addCallback(new VideoAdPlayer.VideoAdPlayerCallback() {
+            @Override
+            public void onPlay() {
+                if (!isAdDisplayed) {
+                    return;
+                }
+                for (VideoAdPlayer.VideoAdPlayerCallback callback : adCallbacks) {
+                    callback.onPlay();
+                }
+            }
+
+            @Override
+            public void onVolumeChanged(int i) {
+                if (!isAdDisplayed) {
+                    return;
+                }
+                for (VideoAdPlayer.VideoAdPlayerCallback callback : adCallbacks) {
+                    callback.onVolumeChanged(i);
+                }
+            }
+
+            @Override
+            public void onPause() {
+                if (!isAdDisplayed) {
+                    return;
+                }
+                for (VideoAdPlayer.VideoAdPlayerCallback callback : adCallbacks) {
+                    callback.onPause();
+                }
+            }
+
+            @Override
+            public void onResume() {
+                if (!isAdDisplayed) {
+                    return;
+                }
+                for (VideoAdPlayer.VideoAdPlayerCallback callback : adCallbacks) {
+                    callback.onResume();
+                }
+            }
+
+            @Override
+            public void onEnded() {
+                if (!isAdDisplayed) {
+                    return;
+                }
+                for (VideoAdPlayer.VideoAdPlayerCallback callback : adCallbacks) {
+                    callback.onEnded();
+                }
+            }
+
+            @Override
+            public void onError() {
+                if (!isAdDisplayed) {
+                    return;
+                }
+                for (VideoAdPlayer.VideoAdPlayerCallback callback : adCallbacks) {
+                    callback.onError();
+                }
+            }
+        });
         contentProgressProvider = new ContentProgressProvider() {
             @Override
             public VideoProgressUpdate getContentProgress() {
@@ -206,6 +271,10 @@ public class AdPlayerController {
         if (adsManager != null && isAdDisplayed) {
             adsManager.resume();
         }
+    }
+
+    public VideoAdPlayer getVideoAdPlayer() {
+        return videoAdPlayer;
     }
 
     public void addAdEventListener(final AdEvent.AdEventListener l) {
