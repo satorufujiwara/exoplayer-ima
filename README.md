@@ -7,6 +7,7 @@ exoplayer-ima
 *This library is experimental. API and all codes will be changed without notice*
 
 [Google Interactive Media Ads (IMA) SDK](https://developers.google.com/interactive-media-ads/docs/sdks/android/)'s wrapper for using with [ExoPlayer](https://github.com/google/ExoPlayer) and TextureView.
+
 This library depends on [exoplayer-textureview](https://github.com/satorufujiwara/exoplayer-textureview)
 
 # Features
