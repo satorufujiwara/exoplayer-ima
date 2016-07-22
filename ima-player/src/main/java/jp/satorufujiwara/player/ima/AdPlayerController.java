@@ -35,6 +35,8 @@ public class AdPlayerController {
     private final ImaSdkFactory sdkFactory;
     private final AdsLoader adsLoader;
     private final List<VideoAdPlayer.VideoAdPlayerCallback> adCallbacks = new ArrayList<>(1);
+    private final List<AdEvent.AdEventListener> adEventListeners = new ArrayList<>();
+    private final List<AdErrorEvent.AdErrorListener> adErrorListeners = new ArrayList<>();
     private AdsManager adsManager;
     private OnResumeContentListener resumeContentListener;
     private OnPauseContentListener pauseContentListener;
@@ -227,6 +229,14 @@ public class AdPlayerController {
                         }
                     }
                 });
+                for (AdEvent.AdEventListener l : adEventListeners) {
+                    adsManager.addAdEventListener(l);
+                }
+                adEventListeners.clear();
+                for (AdErrorEvent.AdErrorListener l : adErrorListeners) {
+                    adsManager.addAdErrorListener(l);
+                }
+                adErrorListeners.clear();
                 adsManager.init();
             }
         });
@@ -283,14 +293,18 @@ public class AdPlayerController {
     }
 
     public void addAdEventListener(final AdEvent.AdEventListener l) {
-        if (adsManager != null) {
+        if (adsManager == null) {
+            adEventListeners.add(l);
+        } else {
             adsManager.addAdEventListener(l);
         }
     }
 
     public void addAdErrorListener(final AdErrorEvent.AdErrorListener l) {
-        if (adsLoader != null && adsManager != null) {
-            adsLoader.addAdErrorListener(l);
+        adsLoader.addAdErrorListener(l);
+        if (adsManager == null) {
+            adErrorListeners.add(l);
+        } else {
             adsManager.addAdErrorListener(l);
         }
     }
