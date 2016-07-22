@@ -7,6 +7,7 @@ import com.google.ads.interactivemedia.v3.api.AdsLoader;
 import com.google.ads.interactivemedia.v3.api.AdsManager;
 import com.google.ads.interactivemedia.v3.api.AdsManagerLoadedEvent;
 import com.google.ads.interactivemedia.v3.api.AdsRequest;
+import com.google.ads.interactivemedia.v3.api.CompanionAdSlot;
 import com.google.ads.interactivemedia.v3.api.ImaSdkFactory;
 import com.google.ads.interactivemedia.v3.api.ImaSdkSettings;
 import com.google.ads.interactivemedia.v3.api.player.ContentProgressProvider;
@@ -34,6 +35,9 @@ public class AdPlayerController {
     private final ViewGroup adUiContainer;
     private final ImaSdkFactory sdkFactory;
     private final AdsLoader adsLoader;
+    private final ViewGroup companionContainer;
+    private final int companionWidth;
+    private final int companionHeight;
     private final List<VideoAdPlayer.VideoAdPlayerCallback> adCallbacks = new ArrayList<>(1);
     private final List<AdEvent.AdEventListener> adEventListeners = new ArrayList<>();
     private final List<AdErrorEvent.AdErrorListener> adErrorListeners = new ArrayList<>();
@@ -47,8 +51,12 @@ public class AdPlayerController {
 
     AdPlayerController(final Context context, final String language,
             final String userAgent, final VideoTexturePresenter videoTexturePresenter,
-            final ViewGroup adUiContainer) {
+            final ViewGroup adUiContainer, final ViewGroup companionContainer,
+            final int companionWidth, final int companionHeight) {
         this.adUiContainer = adUiContainer;
+        this.companionContainer = companionContainer;
+        this.companionWidth = companionWidth;
+        this.companionHeight = companionHeight;
         videoAdPlayer = new VideoAdPlayer() {
             @Override
             public void playAd() {
@@ -256,13 +264,14 @@ public class AdPlayerController {
         container.setPlayer(videoAdPlayer);
         container.setAdContainer(adUiContainer);
 
-        // Set up spots for companions.
-//        CompanionAdSlot companionAdSlot = mSdkFactory.createCompanionAdSlot();
-//        companionAdSlot.setContainer(mCompanionViewGroup);
-//        companionAdSlot.setSize(728, 90);
-//        ArrayList<CompanionAdSlot> companionAdSlots = new ArrayList<CompanionAdSlot>();
-//        companionAdSlots.add(companionAdSlot);
-//        mAdDisplayContainer.setCompanionSlots(companionAdSlots);
+        if (companionContainer != null) {
+            CompanionAdSlot companionAdSlot = sdkFactory.createCompanionAdSlot();
+            companionAdSlot.setContainer(companionContainer);
+            companionAdSlot.setSize(companionWidth, companionHeight);
+            ArrayList<CompanionAdSlot> companionAdSlots = new ArrayList<>();
+            companionAdSlots.add(companionAdSlot);
+            container.setCompanionSlots(companionAdSlots);
+        }
 
         final AdsRequest request = sdkFactory.createAdsRequest();
         request.setAdTagUrl(adTagUrl);
@@ -357,6 +366,9 @@ public class AdPlayerController {
         private ViewGroup adUiContainer;
         private String language = "en";
         private String userAgent = "UserAgent";
+        private ViewGroup companionContainer;
+        private int companionWidth;
+        private int companionHeight;
 
         public Builder(Context context) {
             this.context = context;
@@ -382,6 +394,21 @@ public class AdPlayerController {
             return this;
         }
 
+        public Builder setCompanionContainer(final ViewGroup companionContainer) {
+            this.companionContainer = companionContainer;
+            return this;
+        }
+
+        public Builder setCompanionWidth(final int companionWidth) {
+            this.companionWidth = companionWidth;
+            return this;
+        }
+
+        public Builder setCompanionHeight(final int companionHeight) {
+            this.companionHeight = companionHeight;
+            return this;
+        }
+
         public AdPlayerController create() {
             if (context == null) {
                 throw new RuntimeException("Context must not be null.");
@@ -393,7 +420,7 @@ public class AdPlayerController {
                 throw new RuntimeException("AdUiContainer must not be null.");
             }
             return new AdPlayerController(context, language, userAgent, videoTexturePresenter,
-                    adUiContainer);
+                    adUiContainer, companionContainer, companionWidth, companionHeight);
         }
 
     }
