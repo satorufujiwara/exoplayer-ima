@@ -399,12 +399,8 @@ public class AdPlayerController {
             return this;
         }
 
-        public Builder setCompanionWidth(final int companionWidth) {
+        public Builder setCompanionSize(final int companionWidth, final int companionHeight) {
             this.companionWidth = companionWidth;
-            return this;
-        }
-
-        public Builder setCompanionHeight(final int companionHeight) {
             this.companionHeight = companionHeight;
             return this;
         }
