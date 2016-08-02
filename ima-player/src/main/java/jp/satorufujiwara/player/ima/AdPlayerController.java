@@ -321,6 +321,21 @@ public class AdPlayerController {
         }
     }
 
+    public void removeAdEventListener(final AdEvent.AdEventListener l) {
+        adEventListeners.remove(l);
+        if (adsManager != null) {
+            adsManager.removeAdEventListener(l);
+        }
+    }
+
+    public void removeAdErrorListener(final AdErrorEvent.AdErrorListener l) {
+        adErrorListeners.remove(l);
+        adsLoader.removeAdErrorListener(l);
+        if (adsManager != null) {
+            adsManager.removeAdErrorListener(l);
+        }
+    }
+
     public void setOnResumeContentListener(final OnResumeContentListener l) {
         resumeContentListener = l;
     }
