@@ -22,6 +22,7 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 import java.util.List;
 
+import jp.satorufujiwara.player.Player;
 import jp.satorufujiwara.player.VideoSource;
 import jp.satorufujiwara.player.VideoTexturePresenter;
 import jp.satorufujiwara.player.assets.AssetsVideoSource;
@@ -57,6 +58,15 @@ public class AdPlayerController {
         this.companionContainer = companionContainer;
         this.companionWidth = companionWidth;
         this.companionHeight = companionHeight;
+        videoTexturePresenter.addOnStateChangedListener(
+                new VideoTexturePresenter.OnStateChangedListener() {
+                    @Override
+                    public void onStateChanged(boolean playWhenReady, int playbackState) {
+                        if (isAdDisplayed && playbackState == Player.STATE_ENDED) {
+                            completeAd();
+                        }
+                    }
+                });
         videoAdPlayer = new VideoAdPlayer() {
             @Override
             public void playAd() {
@@ -240,11 +250,9 @@ public class AdPlayerController {
                 for (AdEvent.AdEventListener l : adEventListeners) {
                     adsManager.addAdEventListener(l);
                 }
-                adEventListeners.clear();
                 for (AdErrorEvent.AdErrorListener l : adErrorListeners) {
                     adsManager.addAdErrorListener(l);
                 }
-                adErrorListeners.clear();
                 adsManager.init();
             }
         });
@@ -255,10 +263,7 @@ public class AdPlayerController {
             requestResumeContent();
             return;
         }
-        if (adsManager != null) {
-            adsManager.destroy();
-        }
-        adsLoader.contentComplete();
+        completeAd();
 
         final AdDisplayContainer container = sdkFactory.createAdDisplayContainer();
         container.setPlayer(videoAdPlayer);
@@ -302,18 +307,16 @@ public class AdPlayerController {
     }
 
     public void addAdEventListener(final AdEvent.AdEventListener l) {
-        if (adsManager == null) {
-            adEventListeners.add(l);
-        } else {
+        adEventListeners.add(l);
+        if (adsManager != null) {
             adsManager.addAdEventListener(l);
         }
     }
 
     public void addAdErrorListener(final AdErrorEvent.AdErrorListener l) {
+        adErrorListeners.add(l);
         adsLoader.addAdErrorListener(l);
-        if (adsManager == null) {
-            adErrorListeners.add(l);
-        } else {
+        if (adsManager != null) {
             adsManager.addAdErrorListener(l);
         }
     }
@@ -324,6 +327,13 @@ public class AdPlayerController {
 
     public void setOnPauseContentListener(final OnPauseContentListener l) {
         pauseContentListener = l;
+    }
+
+    private void completeAd() {
+        if (adsManager != null) {
+            adsManager.destroy();
+        }
+        adsLoader.contentComplete();
     }
 
     private VideoSource createVideoSourceFrom(String url, String userAgent) {
