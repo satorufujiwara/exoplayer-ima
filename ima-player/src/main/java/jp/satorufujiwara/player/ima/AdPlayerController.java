@@ -42,6 +42,7 @@ public class AdPlayerController {
     private final List<VideoAdPlayer.VideoAdPlayerCallback> adCallbacks = new ArrayList<>(1);
     private final List<AdEvent.AdEventListener> adEventListeners = new ArrayList<>();
     private final List<AdErrorEvent.AdErrorListener> adErrorListeners = new ArrayList<>();
+    private final List<AdProgressUpdatedListener> adProgressListeners = new ArrayList<>();
     private AdsManager adsManager;
     private OnResumeContentListener resumeContentListener;
     private OnPauseContentListener pauseContentListener;
@@ -112,8 +113,13 @@ public class AdPlayerController {
                 if (!isAdDisplayed || videoTexturePresenter.getDuration() <= 0) {
                     return VideoProgressUpdate.VIDEO_TIME_NOT_READY;
                 }
-                return new VideoProgressUpdate(videoTexturePresenter.getCurrentPosition(),
+                VideoProgressUpdate progress = new VideoProgressUpdate(
+                        videoTexturePresenter.getCurrentPosition(),
                         videoTexturePresenter.getDuration());
+                for (AdProgressUpdatedListener l : adProgressListeners) {
+                    l.onProgressUpdated(progress);
+                }
+                return progress;
             }
         };
         videoAdPlayer.addCallback(new VideoAdPlayer.VideoAdPlayerCallback() {
@@ -334,6 +340,14 @@ public class AdPlayerController {
         if (adsManager != null) {
             adsManager.removeAdErrorListener(l);
         }
+    }
+
+    public void addAdProgressUpdatedListener(final AdProgressUpdatedListener l) {
+        adProgressListeners.add(l);
+    }
+
+    public void removeAdProgressUpdatedListener(final AdProgressUpdatedListener l) {
+        adProgressListeners.remove(l);
     }
 
     public void setOnResumeContentListener(final OnResumeContentListener l) {
