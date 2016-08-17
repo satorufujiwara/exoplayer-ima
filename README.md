@@ -8,7 +8,7 @@ exoplayer-ima
 
 [Google Interactive Media Ads (IMA) SDK](https://developers.google.com/interactive-media-ads/docs/sdks/android/)'s wrapper for using with [ExoPlayer](https://github.com/google/ExoPlayer) and TextureView.
 
-This library depends on [exoplayer-textureview](https://github.com/satorufujiwara/exoplayer-textureview)(0.6.8+)
+This library depends on [exoplayer-textureview](https://github.com/satorufujiwara/exoplayer-textureview)(0.6.8+) and based on [googleads-ima-android](https://github.com/googleads/googleads-ima-android).
 
 # Features
 * Request and track VAST ads.
