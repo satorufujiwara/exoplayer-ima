@@ -63,11 +63,40 @@ public class AdPlayerController {
                 new VideoTexturePresenter.OnStateChangedListener() {
                     @Override
                     public void onStateChanged(boolean playWhenReady, int playbackState) {
-                        if (isAdDisplayed && playbackState == Player.STATE_ENDED) {
-                            completeAd();
+                        if (!isAdDisplayed) {
+                            return;
+                        }
+                        if (playbackState == Player.STATE_ENDED) {
+                            for (VideoAdPlayer.VideoAdPlayerCallback callback : adCallbacks) {
+                                callback.onEnded();
+                            }
+                            return;
+                        }
+                        if (playbackState != Player.STATE_READY) {
+                            return;
+                        }
+                        if (playWhenReady) {
+                            for (VideoAdPlayer.VideoAdPlayerCallback callback : adCallbacks) {
+                                callback.onPlay();
+                            }
+                        } else {
+                            for (VideoAdPlayer.VideoAdPlayerCallback callback : adCallbacks) {
+                                callback.onPause();
+                            }
                         }
                     }
                 });
+        videoTexturePresenter.addOnErrorListener(new VideoTexturePresenter.OnErrorListener() {
+            @Override
+            public void onError(Exception e) {
+                if (!isAdDisplayed) {
+                    return;
+                }
+                for (VideoAdPlayer.VideoAdPlayerCallback callback : adCallbacks) {
+                    callback.onError();
+                }
+            }
+        });
         videoAdPlayer = new VideoAdPlayer() {
             @Override
             public void playAd() {
@@ -122,67 +151,6 @@ public class AdPlayerController {
                 return progress;
             }
         };
-        videoAdPlayer.addCallback(new VideoAdPlayer.VideoAdPlayerCallback() {
-            @Override
-            public void onPlay() {
-                if (!isAdDisplayed) {
-                    return;
-                }
-                for (VideoAdPlayer.VideoAdPlayerCallback callback : adCallbacks) {
-                    callback.onPlay();
-                }
-            }
-
-            @Override
-            public void onVolumeChanged(int i) {
-                if (!isAdDisplayed) {
-                    return;
-                }
-                for (VideoAdPlayer.VideoAdPlayerCallback callback : adCallbacks) {
-                    callback.onVolumeChanged(i);
-                }
-            }
-
-            @Override
-            public void onPause() {
-                if (!isAdDisplayed) {
-                    return;
-                }
-                for (VideoAdPlayer.VideoAdPlayerCallback callback : adCallbacks) {
-                    callback.onPause();
-                }
-            }
-
-            @Override
-            public void onResume() {
-                if (!isAdDisplayed) {
-                    return;
-                }
-                for (VideoAdPlayer.VideoAdPlayerCallback callback : adCallbacks) {
-                    callback.onResume();
-                }
-            }
-
-            @Override
-            public void onEnded() {
-                if (!isAdDisplayed) {
-                    return;
-                }
-                for (VideoAdPlayer.VideoAdPlayerCallback callback : adCallbacks) {
-                    callback.onEnded();
-                }
-            }
-
-            @Override
-            public void onError() {
-                if (!isAdDisplayed) {
-                    return;
-                }
-                for (VideoAdPlayer.VideoAdPlayerCallback callback : adCallbacks) {
-                    callback.onError();
-                }
-            }
-        });
         contentProgressProvider = new ContentProgressProvider() {
             @Override
             public VideoProgressUpdate getContentProgress() {
